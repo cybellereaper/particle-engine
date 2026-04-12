@@ -1,0 +1,28 @@
+name: ParticleEngine
+version: '${version}'
+main: com.github.cybellereaper.particleengine.ParticleEnginePlugin
+api-version: '1.21'
+authors: [cybellereaper]
+description: Production-grade particle engine for Paper servers.
+commands:
+  particleengine:
+    description: Main command for particle engine control.
+    usage: /particleengine <help|spawn|stop|list|reload|debug|save>
+    aliases: [pe, particles]
+permissions:
+  particleengine.command.help:
+    default: true
+  particleengine.command.spawn:
+    default: op
+  particleengine.command.stop:
+    default: op
+  particleengine.command.list:
+    default: op
+  particleengine.command.reload:
+    default: op
+  particleengine.command.debug:
+    default: op
+  particleengine.command.save:
+    default: op
+  particleengine.effect.*:
+    default: op

@@ -1,0 +1,42 @@
+effects:
+  trail_smoke:
+    family: TRAIL
+    particle: CLOUD
+    count: 2
+    lifetimeTicks: 100
+    anchor:
+      type: PLAYER
+      selector: self
+      space: LOCAL
+    emitters:
+      - shape: LINE
+        rate: 1
+        points: 4
+        from: [0.0, 0.0, 0.0]
+        to: [0.0, 0.2, -0.8]
+    timeline:
+      durationTicks: 100
+      loop: true
+      keyframes:
+        - tick: 0
+          params: {scale: 0.4}
+        - tick: 60
+          params: {scale: 1.0}
+
+  orbital_arcane:
+    family: ORBITAL
+    particle: ENCHANT
+    count: 1
+    lifetimeTicks: 200
+    anchor:
+      type: PLAYER
+      selector: self
+      space: LOCAL
+    emitters:
+      - shape: CIRCLE
+        rate: 1
+        points: 24
+        radius: 1.3
+    modifiers:
+      - type: SPIN_YAW
+        speed: 4.0
