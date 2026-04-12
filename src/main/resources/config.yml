@@ -1,0 +1,14 @@
+engine:
+  tick-budget-nanos: 1500000
+  max-active-effects: 2000
+  default-view-distance: 48.0
+  lod-distance-threshold: 24.0
+  lod-throttle-factor: 2
+  deterministic-random-seed: 1337
+  collision-sampling-step: 0.35
+
+storage:
+  named-effects-file: named-effects.yml
+
+debug:
+  enabled-by-default: false
