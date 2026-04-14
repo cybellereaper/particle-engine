@@ -212,10 +212,25 @@ public final class Shapes {
 
         List<Vec3> points = new ArrayList<>();
         for (Object entry : list) {
-            if (!(entry instanceof List<?> vec) || vec.size() < 3) continue;
-            points.add(new Vec3(asDouble(vec.get(0), 0D), asDouble(vec.get(1), 0D), asDouble(vec.get(2), 0D)));
+            Vec3 point = vecFrom(entry);
+            if (point == null) continue;
+            points.add(point);
         }
         return points;
+    }
+
+    private static Vec3 vecFrom(Object raw) {
+        if (raw instanceof List<?> vec && vec.size() >= 3) {
+            return new Vec3(asDouble(vec.get(0), 0D), asDouble(vec.get(1), 0D), asDouble(vec.get(2), 0D));
+        }
+        if (raw instanceof Map<?, ?> point) {
+            return new Vec3(
+                    asDouble(point.get("x"), 0D),
+                    asDouble(point.get("y"), 0D),
+                    asDouble(point.get("z"), 0D)
+            );
+        }
+        return null;
     }
 
     private static double num(Map<String, Object> map, String key, double fallback) {
