@@ -66,4 +66,54 @@ class ShapesTest {
                 Shapes.polyline(emitter, 0, new Random(1))
         );
     }
+
+    @Test
+    void polylineAcceptsPathAsObjectPoints() {
+        EmitterDefinition emitter = new EmitterDefinition(
+                ShapeType.POLYLINE,
+                1,
+                3,
+                Map.of("path", java.util.List.of(
+                        Map.of("x", 0.0, "y", 0.0, "z", -1.0),
+                        Map.of("x", 0.0, "y", 0.0, "z", 0.0),
+                        Map.of("x", 0.0, "y", 0.0, "z", 1.0)
+                ))
+        );
+
+        assertIterableEquals(
+                java.util.List.of(
+                        new Vec3(0, 0, -1),
+                        new Vec3(0, 0, 0),
+                        new Vec3(0, 0, 1)
+                ),
+                Shapes.polyline(emitter, 0, new Random(1))
+        );
+    }
+
+    @Test
+    void polylineIgnoresInvalidPathEntries() {
+        EmitterDefinition emitter = new EmitterDefinition(
+                ShapeType.POLYLINE,
+                1,
+                3,
+                Map.of(
+                        "from", java.util.List.of(1, 0, 0),
+                        "to", java.util.List.of(1, 0, 2),
+                        "path", java.util.List.of(
+                                "bad",
+                                java.util.List.of(0, 0, 0),
+                                Map.of("x", 0.0, "y", 0.0, "z", 2.0)
+                        )
+                )
+        );
+
+        assertIterableEquals(
+                java.util.List.of(
+                        new Vec3(0, 0, 0),
+                        new Vec3(0, 0, 1),
+                        new Vec3(0, 0, 2)
+                ),
+                Shapes.polyline(emitter, 0, new Random(1))
+        );
+    }
 }
