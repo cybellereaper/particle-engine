@@ -23,6 +23,7 @@ public final class ShapeRegistry {
         register(ShapeType.HELIX, Shapes::helix);
         register(ShapeType.SPIRAL, Shapes::spiral);
         register(ShapeType.BEZIER, Shapes::bezier);
+        register(ShapeType.POLYLINE, Shapes::polyline);
     }
 
     public void register(ShapeType type, ShapeGenerator generator) {
