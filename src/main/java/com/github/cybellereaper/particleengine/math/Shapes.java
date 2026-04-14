@@ -133,6 +133,32 @@ public final class Shapes {
         return out;
     }
 
+    public static List<Vec3> polyline(EmitterDefinition emitter, int tick, Random random) {
+        List<Vec3> controlPoints = vecList(emitter.params(), "path");
+        if (controlPoints.size() < 2) {
+            return line(emitter, tick, random);
+        }
+
+        int points = Math.max(2, emitter.points());
+        if (points == 2) {
+            return List.of(controlPoints.getFirst(), controlPoints.getLast());
+        }
+
+        List<Double> cumulativeLengths = cumulativeLengths(controlPoints);
+        double totalLength = cumulativeLengths.getLast();
+        if (totalLength <= 0D) {
+            return List.of(controlPoints.getFirst(), controlPoints.getLast());
+        }
+
+        List<Vec3> out = new ArrayList<>(points);
+        for (int i = 0; i < points; i++) {
+            double normalized = i / (double) (points - 1);
+            double targetDistance = normalized * totalLength;
+            out.add(sampleAlongPath(controlPoints, cumulativeLengths, targetDistance));
+        }
+        return out;
+    }
+
     private static Vec3 cubicBezier(Vec3 p0, Vec3 p1, Vec3 p2, Vec3 p3, double t) {
         double u = 1D - t;
         return p0.scale(u * u * u)
@@ -141,10 +167,55 @@ public final class Shapes {
                 .add(p3.scale(t * t * t));
     }
 
+    private static Vec3 sampleAlongPath(List<Vec3> points, List<Double> cumulativeLengths, double targetDistance) {
+        for (int i = 1; i < cumulativeLengths.size(); i++) {
+            double segmentEnd = cumulativeLengths.get(i);
+            if (targetDistance > segmentEnd) continue;
+
+            double segmentStart = cumulativeLengths.get(i - 1);
+            double segmentLength = segmentEnd - segmentStart;
+            if (segmentLength <= 0D) return points.get(i);
+
+            double segmentT = (targetDistance - segmentStart) / segmentLength;
+            return Vec3.lerp(points.get(i - 1), points.get(i), segmentT);
+        }
+        return points.getLast();
+    }
+
+    private static List<Double> cumulativeLengths(List<Vec3> points) {
+        List<Double> cumulativeLengths = new ArrayList<>(points.size());
+        cumulativeLengths.add(0D);
+        double length = 0D;
+        for (int i = 1; i < points.size(); i++) {
+            length += distance(points.get(i - 1), points.get(i));
+            cumulativeLengths.add(length);
+        }
+        return cumulativeLengths;
+    }
+
+    private static double distance(Vec3 a, Vec3 b) {
+        double dx = a.x() - b.x();
+        double dy = a.y() - b.y();
+        double dz = a.z() - b.z();
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
+
     private static Vec3 vec(Map<String, Object> map, String key, Vec3 fallback) {
         Object raw = map.get(key);
         if (!(raw instanceof List<?> list) || list.size() < 3) return fallback;
         return new Vec3(asDouble(list.get(0), fallback.x()), asDouble(list.get(1), fallback.y()), asDouble(list.get(2), fallback.z()));
+    }
+
+    private static List<Vec3> vecList(Map<String, Object> map, String key) {
+        Object raw = map.get(key);
+        if (!(raw instanceof List<?> list)) return List.of();
+
+        List<Vec3> points = new ArrayList<>();
+        for (Object entry : list) {
+            if (!(entry instanceof List<?> vec) || vec.size() < 3) continue;
+            points.add(new Vec3(asDouble(vec.get(0), 0D), asDouble(vec.get(1), 0D), asDouble(vec.get(2), 0D)));
+        }
+        return points;
     }
 
     private static double num(Map<String, Object> map, String key, double fallback) {

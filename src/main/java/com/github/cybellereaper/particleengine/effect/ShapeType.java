@@ -11,5 +11,6 @@ public enum ShapeType {
     CONE,
     HELIX,
     SPIRAL,
-    BEZIER
+    BEZIER,
+    POLYLINE
 }
