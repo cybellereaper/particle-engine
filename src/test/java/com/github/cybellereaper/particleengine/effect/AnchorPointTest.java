@@ -13,6 +13,13 @@ class AnchorPointTest {
     }
 
     @Test
+    void fromSelectorRecognizesPointInCompositeSelector() {
+        assertEquals(AnchorPoint.HEAD, AnchorPoint.fromSelector("self:head"));
+        assertEquals(AnchorPoint.BACK, AnchorPoint.fromSelector("target_back"));
+        assertEquals(AnchorPoint.FEET, AnchorPoint.fromSelector("entity.feet.local"));
+    }
+
+    @Test
     void fromSelectorFallsBackToFeetWhenUnknown() {
         assertEquals(AnchorPoint.FEET, AnchorPoint.fromSelector("self"));
         assertEquals(AnchorPoint.FEET, AnchorPoint.fromSelector(""));
