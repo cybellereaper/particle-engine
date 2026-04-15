@@ -92,4 +92,31 @@ public final class AnchorResolver {
             return Optional.ofNullable(Bukkit.getPlayer(id));
         }
     }
+
+    private Optional<Entity> lookupEntity(UUID entityId) {
+        if (entityId == null) return Optional.empty();
+        return entityLocator.findEntity(entityId).filter(Entity::isValid);
+    }
+
+    private Optional<Entity> lookupPlayer(UUID playerId) {
+        if (playerId == null) return Optional.empty();
+        return entityLocator.findPlayer(playerId).filter(Entity::isValid).map(Entity.class::cast);
+    }
+
+    interface EntityLocator {
+        Optional<Entity> findEntity(UUID id);
+        Optional<Player> findPlayer(UUID id);
+    }
+
+    private static final class BukkitEntityLocator implements EntityLocator {
+        @Override
+        public Optional<Entity> findEntity(UUID id) {
+            return Optional.ofNullable(Bukkit.getEntity(id));
+        }
+
+        @Override
+        public Optional<Player> findPlayer(UUID id) {
+            return Optional.ofNullable(Bukkit.getPlayer(id));
+        }
+    }
 }
