@@ -116,4 +116,58 @@ class ShapesTest {
                 Shapes.polyline(emitter, 0, new Random(1))
         );
     }
+
+    @Test
+    void circleInterpolatesRadiusFromKeyframes() {
+        EmitterDefinition emitter = new EmitterDefinition(
+                ShapeType.CIRCLE,
+                1,
+                4,
+                Map.of("radius", Map.of(
+                        "keyframes", java.util.List.of(
+                                Map.of("tick", 0, "value", 0.2),
+                                Map.of("tick", 10, "value", 1.0)
+                        )
+                ))
+        );
+
+        java.util.List<Vec3> atTickFive = Shapes.circle(emitter, 5, new Random(1));
+        assertEquals(0.6, atTickFive.getFirst().x(), 0.0001);
+    }
+
+    @Test
+    void polylineInterpolatesPathFromKeyframes() {
+        EmitterDefinition emitter = new EmitterDefinition(
+                ShapeType.POLYLINE,
+                1,
+                3,
+                Map.of("path", Map.of(
+                        "keyframes", java.util.List.of(
+                                Map.of(
+                                        "tick", 0,
+                                        "value", java.util.List.of(
+                                                Map.of("x", 0.0, "y", 0.0, "z", 0.0),
+                                                Map.of("x", 0.0, "y", 0.0, "z", 2.0)
+                                        )
+                                ),
+                                Map.of(
+                                        "tick", 10,
+                                        "value", java.util.List.of(
+                                                Map.of("x", 0.0, "y", 2.0, "z", 0.0),
+                                                Map.of("x", 0.0, "y", 2.0, "z", 2.0)
+                                        )
+                                )
+                        )
+                ))
+        );
+
+        assertIterableEquals(
+                java.util.List.of(
+                        new Vec3(0, 1, 0),
+                        new Vec3(0, 1, 1),
+                        new Vec3(0, 1, 2)
+                ),
+                Shapes.polyline(emitter, 5, new Random(1))
+        );
+    }
 }

@@ -3,6 +3,7 @@ package com.github.cybellereaper.particleengine.math;
 import com.github.cybellereaper.particleengine.effect.EmitterDefinition;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -15,8 +16,8 @@ public final class Shapes {
     }
 
     public static List<Vec3> line(EmitterDefinition emitter, int tick, Random random) {
-        Vec3 from = vec(emitter.params(), "from", new Vec3(0, 0, 0));
-        Vec3 to = vec(emitter.params(), "to", new Vec3(0, 0, 1));
+        Vec3 from = vec(emitter.params(), "from", new Vec3(0, 0, 0), tick);
+        Vec3 to = vec(emitter.params(), "to", new Vec3(0, 0, 1), tick);
         int points = Math.max(2, emitter.points());
         List<Vec3> out = new ArrayList<>(points);
         for (int i = 0; i < points; i++) out.add(Vec3.lerp(from, to, i / (double) (points - 1)));
@@ -24,7 +25,7 @@ public final class Shapes {
     }
 
     public static List<Vec3> circle(EmitterDefinition emitter, int tick, Random random) {
-        double r = num(emitter.params(), "radius", 1.0);
+        double r = num(emitter.params(), "radius", 1.0, tick);
         int points = Math.max(3, emitter.points());
         List<Vec3> out = new ArrayList<>(points);
         for (int i = 0; i < points; i++) {
@@ -35,9 +36,9 @@ public final class Shapes {
     }
 
     public static List<Vec3> spiral(EmitterDefinition emitter, int tick, Random random) {
-        double r = num(emitter.params(), "radius", 1.2);
-        double h = num(emitter.params(), "height", 2.0);
-        double turns = num(emitter.params(), "turns", 3.0);
+        double r = num(emitter.params(), "radius", 1.2, tick);
+        double h = num(emitter.params(), "height", 2.0, tick);
+        double turns = num(emitter.params(), "turns", 3.0, tick);
         int points = Math.max(6, emitter.points());
         List<Vec3> out = new ArrayList<>(points);
         for (int i = 0; i < points; i++) {
@@ -49,9 +50,9 @@ public final class Shapes {
     }
 
     public static List<Vec3> helix(EmitterDefinition emitter, int tick, Random random) {
-        double r = num(emitter.params(), "radius", 1.0);
-        double h = num(emitter.params(), "height", 2.0);
-        double turns = num(emitter.params(), "turns", 2.0);
+        double r = num(emitter.params(), "radius", 1.0, tick);
+        double h = num(emitter.params(), "height", 2.0, tick);
+        double turns = num(emitter.params(), "turns", 2.0, tick);
         int points = Math.max(8, emitter.points());
         List<Vec3> out = new ArrayList<>(points);
         for (int i = 0; i < points; i++) {
@@ -63,7 +64,7 @@ public final class Shapes {
     }
 
     public static List<Vec3> sphere(EmitterDefinition emitter, int tick, Random random) {
-        double r = num(emitter.params(), "radius", 1.0);
+        double r = num(emitter.params(), "radius", 1.0, tick);
         int points = Math.max(8, emitter.points());
         List<Vec3> out = new ArrayList<>(points);
         for (int i = 0; i < points; i++) {
@@ -81,7 +82,7 @@ public final class Shapes {
     }
 
     public static List<Vec3> box(EmitterDefinition emitter, int tick, Random random) {
-        Vec3 size = vec(emitter.params(), "size", new Vec3(1, 1, 1));
+        Vec3 size = vec(emitter.params(), "size", new Vec3(1, 1, 1), tick);
         int points = Math.max(8, emitter.points());
         List<Vec3> out = new ArrayList<>(points);
         for (int i = 0; i < points; i++) {
@@ -95,8 +96,8 @@ public final class Shapes {
     }
 
     public static List<Vec3> cone(EmitterDefinition emitter, int tick, Random random) {
-        double r = num(emitter.params(), "radius", 1.0);
-        double h = num(emitter.params(), "height", 2.0);
+        double r = num(emitter.params(), "radius", 1.0, tick);
+        double h = num(emitter.params(), "height", 2.0, tick);
         int points = Math.max(6, emitter.points());
         List<Vec3> out = new ArrayList<>(points);
         for (int i = 0; i < points; i++) {
@@ -108,8 +109,8 @@ public final class Shapes {
     }
 
     public static List<Vec3> cylinder(EmitterDefinition emitter, int tick, Random random) {
-        double r = num(emitter.params(), "radius", 1.0);
-        double h = num(emitter.params(), "height", 2.0);
+        double r = num(emitter.params(), "radius", 1.0, tick);
+        double h = num(emitter.params(), "height", 2.0, tick);
         int points = Math.max(8, emitter.points());
         List<Vec3> out = new ArrayList<>(points);
         for (int i = 0; i < points; i++) {
@@ -120,10 +121,10 @@ public final class Shapes {
     }
 
     public static List<Vec3> bezier(EmitterDefinition emitter, int tick, Random random) {
-        Vec3 p0 = vec(emitter.params(), "p0", new Vec3(0, 0, 0));
-        Vec3 p1 = vec(emitter.params(), "p1", new Vec3(0, 1, 0));
-        Vec3 p2 = vec(emitter.params(), "p2", new Vec3(0, 1, 1));
-        Vec3 p3 = vec(emitter.params(), "p3", new Vec3(0, 0, 2));
+        Vec3 p0 = vec(emitter.params(), "p0", new Vec3(0, 0, 0), tick);
+        Vec3 p1 = vec(emitter.params(), "p1", new Vec3(0, 1, 0), tick);
+        Vec3 p2 = vec(emitter.params(), "p2", new Vec3(0, 1, 1), tick);
+        Vec3 p3 = vec(emitter.params(), "p3", new Vec3(0, 0, 2), tick);
         int points = Math.max(4, emitter.points());
         List<Vec3> out = new ArrayList<>(points);
         for (int i = 0; i < points; i++) {
@@ -134,7 +135,7 @@ public final class Shapes {
     }
 
     public static List<Vec3> polyline(EmitterDefinition emitter, int tick, Random random) {
-        List<Vec3> controlPoints = vecList(emitter.params(), "path");
+        List<Vec3> controlPoints = vecList(emitter.params(), "path", tick);
         if (controlPoints.size() < 2) {
             return line(emitter, tick, random);
         }
@@ -200,14 +201,14 @@ public final class Shapes {
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
-    private static Vec3 vec(Map<String, Object> map, String key, Vec3 fallback) {
-        Object raw = map.get(key);
+    private static Vec3 vec(Map<String, Object> map, String key, Vec3 fallback, int tick) {
+        Object raw = resolveTickValue(map.get(key), tick);
         if (!(raw instanceof List<?> list) || list.size() < 3) return fallback;
         return new Vec3(asDouble(list.get(0), fallback.x()), asDouble(list.get(1), fallback.y()), asDouble(list.get(2), fallback.z()));
     }
 
-    private static List<Vec3> vecList(Map<String, Object> map, String key) {
-        Object raw = map.get(key);
+    private static List<Vec3> vecList(Map<String, Object> map, String key, int tick) {
+        Object raw = resolveTickValue(map.get(key), tick);
         if (!(raw instanceof List<?> list)) return List.of();
 
         List<Vec3> points = new ArrayList<>();
@@ -233,8 +234,102 @@ public final class Shapes {
         return null;
     }
 
-    private static double num(Map<String, Object> map, String key, double fallback) {
-        return asDouble(map.get(key), fallback);
+    private static double num(Map<String, Object> map, String key, double fallback, int tick) {
+        return asDouble(resolveTickValue(map.get(key), tick), fallback);
+    }
+
+    private static Object resolveTickValue(Object raw, int tick) {
+        if (!(raw instanceof Map<?, ?> candidate)) {
+            return raw;
+        }
+        Object frameObject = candidate.get("keyframes");
+        if (!(frameObject instanceof List<?> frameList) || frameList.isEmpty()) {
+            return raw;
+        }
+
+        List<Map<?, ?>> keyframes = new ArrayList<>();
+        for (Object frame : frameList) {
+            if (frame instanceof Map<?, ?> map && map.containsKey("tick") && map.containsKey("value")) {
+                keyframes.add(map);
+            }
+        }
+        if (keyframes.isEmpty()) {
+            return raw;
+        }
+
+        keyframes.sort(Comparator.comparingInt(frame -> asInt(frame.get("tick"), 0)));
+        Object firstValue = keyframes.getFirst().get("value");
+        if (tick <= asInt(keyframes.getFirst().get("tick"), 0)) {
+            return firstValue;
+        }
+
+        for (int i = 1; i < keyframes.size(); i++) {
+            Map<?, ?> previous = keyframes.get(i - 1);
+            Map<?, ?> current = keyframes.get(i);
+            int fromTick = asInt(previous.get("tick"), 0);
+            int toTick = asInt(current.get("tick"), fromTick);
+            if (tick > toTick) {
+                continue;
+            }
+            Object fromValue = previous.get("value");
+            Object toValue = current.get("value");
+            if (toTick <= fromTick) {
+                return toValue;
+            }
+            double progress = (tick - fromTick) / (double) (toTick - fromTick);
+            return interpolateValue(fromValue, toValue, progress);
+        }
+        return keyframes.getLast().get("value");
+    }
+
+    private static Object interpolateValue(Object from, Object to, double progress) {
+        if (from instanceof Number || to instanceof Number) {
+            return interpolateNumber(from, to, progress);
+        }
+        Vec3 fromVec = vecFrom(from);
+        Vec3 toVec = vecFrom(to);
+        if (fromVec != null && toVec != null) {
+            Vec3 interpolated = Vec3.lerp(fromVec, toVec, progress);
+            return List.of(interpolated.x(), interpolated.y(), interpolated.z());
+        }
+
+        List<Vec3> fromPoints = vecListFrom(from);
+        List<Vec3> toPoints = vecListFrom(to);
+        if (!fromPoints.isEmpty() && fromPoints.size() == toPoints.size()) {
+            List<List<Double>> interpolated = new ArrayList<>(fromPoints.size());
+            for (int i = 0; i < fromPoints.size(); i++) {
+                Vec3 point = Vec3.lerp(fromPoints.get(i), toPoints.get(i), progress);
+                interpolated.add(List.of(point.x(), point.y(), point.z()));
+            }
+            return interpolated;
+        }
+        return progress < 1D ? from : to;
+    }
+
+    private static double interpolateNumber(Object from, Object to, double progress) {
+        double fromValue = asDouble(from, 0D);
+        double toValue = asDouble(to, fromValue);
+        return fromValue + ((toValue - fromValue) * progress);
+    }
+
+    private static List<Vec3> vecListFrom(Object raw) {
+        if (!(raw instanceof List<?> list)) return List.of();
+        List<Vec3> points = new ArrayList<>();
+        for (Object entry : list) {
+            Vec3 point = vecFrom(entry);
+            if (point != null) {
+                points.add(point);
+            }
+        }
+        return points;
+    }
+
+    private static int asInt(Object raw, int fallback) {
+        if (raw instanceof Number number) return number.intValue();
+        if (raw instanceof String s) {
+            try { return Integer.parseInt(s); } catch (NumberFormatException ignored) { return fallback; }
+        }
+        return fallback;
     }
 
     private static double asDouble(Object raw, double fallback) {
