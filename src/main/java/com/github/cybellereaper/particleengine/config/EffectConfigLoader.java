@@ -65,14 +65,17 @@ public final class EffectConfigLoader {
 
         List<EmitterDefinition> emitters = new ArrayList<>();
         List<Map<?, ?>> emitterList = section.getMapList("emitters");
-        if (emitterList.isEmpty()) issues.add(new ValidationIssue(path + ".emitters", "At least one emitter is required."));
-        for (int i = 0; i < emitterList.size(); i++) {
-            Map<?, ?> map = emitterList.get(i);
-            String entryPath = path + ".emitters[" + i + "]";
-            ShapeType shape = enumOf(ShapeType.class, str(map.get("shape")), ShapeType.POINT, entryPath + ".shape", issues);
-            int rate = asInt(map.get("rate"), 1);
-            int points = asInt(map.get("points"), 8);
-            emitters.add(new EmitterDefinition(shape, Math.max(1, rate), Math.max(1, points), castStringObjectMap(map)));
+        if (emitterList.isEmpty()) {
+            emitters.addAll(EffectFamilyDefaults.defaultEmittersFor(family));
+        } else {
+            for (int i = 0; i < emitterList.size(); i++) {
+                Map<?, ?> map = emitterList.get(i);
+                String entryPath = path + ".emitters[" + i + "]";
+                ShapeType shape = enumOf(ShapeType.class, str(map.get("shape")), ShapeType.POINT, entryPath + ".shape", issues);
+                int rate = asInt(map.get("rate"), 1);
+                int points = asInt(map.get("points"), 8);
+                emitters.add(new EmitterDefinition(shape, Math.max(1, rate), Math.max(1, points), castStringObjectMap(map)));
+            }
         }
 
         List<ModifierDefinition> modifiers = new ArrayList<>();

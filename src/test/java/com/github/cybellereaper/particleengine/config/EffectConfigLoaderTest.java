@@ -41,4 +41,30 @@ class EffectConfigLoaderTest {
         assertEquals(ShapeType.CIRCLE, result.templates().getFirst().emitters().getFirst().shape());
         assertFalse(result.hasErrors());
     }
+
+    @Test
+    void appliesFamilyDefaultsWhenEmittersAreMissing() throws IOException {
+        File dataDir = Files.createTempDirectory("pe-config-test-default-family").toFile();
+        File effects = new File(dataDir, "effects");
+        assertTrue(effects.mkdirs());
+        Files.writeString(new File(effects, "test.yml").toPath(), """
+            effects:
+              aura_demo:
+                family: AURA
+                particle: FLAME
+                count: 2
+                lifetimeTicks: 30
+            """);
+
+        Plugin plugin = org.mockito.Mockito.mock(Plugin.class);
+        org.mockito.Mockito.when(plugin.getDataFolder()).thenReturn(dataDir);
+
+        EffectConfigLoader loader = new EffectConfigLoader(plugin);
+        LoadResult result = loader.loadAll();
+
+        assertEquals(1, result.templates().size());
+        assertEquals(ShapeType.SPHERE, result.templates().getFirst().emitters().getFirst().shape());
+        assertFalse(result.hasErrors());
+    }
+
 }
