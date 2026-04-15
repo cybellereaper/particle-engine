@@ -97,8 +97,6 @@ Anchor selector supports common anchor points when resolving from an entity/play
 - `head`
 - `back`
 
-`/pe spawn` now anchors to the executing player entity, so these selectors apply there too.
-
 Example:
 ```yaml
 anchor:

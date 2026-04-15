@@ -30,30 +30,67 @@ public final class AnchorResolver {
     }
 
     public Optional<Location> resolve(EffectTemplate template, EffectRuntimeContext context) {
-        if (context.anchorLocation() != null) {
-            return Optional.of(context.anchorLocation().clone());
+        AnchorType anchorType = template.anchor().type();
+
+        Optional<Location> fromEntity = resolveFromEntity(anchorType, context, template.anchor().selector());
+        if (fromEntity.isPresent()) {
+            return fromEntity;
         }
 
-        Optional<Entity> entity = resolveAnchorEntity(template, context);
-        if (entity.isPresent()) {
-            AnchorPoint point = AnchorPoint.fromSelector(template.anchor().selector());
-            Entity resolvedEntity = entity.get();
-            Location base = resolvedEntity.getLocation();
-            return Optional.of(locationCalculator.calculate(base, base.getDirection(), resolvedEntity.getHeight(), point));
+        if (context.anchorLocation() != null) {
+            return Optional.of(context.anchorLocation().clone());
         }
 
         return Optional.empty();
     }
 
-    private Optional<Entity> resolveAnchorEntity(EffectTemplate template, EffectRuntimeContext context) {
-        Optional<Entity> fromAnchorId = lookupEntity(context.anchorEntityId());
-        if (fromAnchorId.isPresent()) return fromAnchorId;
+    private Optional<Location> resolveFromEntity(AnchorType type, EffectRuntimeContext context, String selector) {
+        Optional<Entity> entity = switch (type) {
+            case PLAYER -> resolvePlayerEntity(context);
+            case ENTITY -> lookupEntity(context.anchorEntityId());
+            default -> Optional.empty();
+        };
 
-        if (template.anchor().type() == AnchorType.PLAYER) {
-            return lookupPlayer(context.initiator());
+        if (entity.isEmpty()) return Optional.empty();
+
+        Entity resolvedEntity = entity.get();
+        Location base = resolvedEntity.getLocation();
+        AnchorPoint point = AnchorPoint.fromSelector(selector);
+        return Optional.of(locationCalculator.calculate(base, base.getDirection(), resolvedEntity.getHeight(), point));
+    }
+
+    private Optional<Entity> resolvePlayerEntity(EffectRuntimeContext context) {
+        Optional<Entity> explicitEntity = lookupEntity(context.anchorEntityId());
+        if (explicitEntity.isPresent()) return explicitEntity;
+        return lookupPlayer(context.initiator());
+    }
+
+    private Optional<Entity> lookupEntity(UUID entityId) {
+        if (entityId == null) return Optional.empty();
+        return entityLocator.findEntity(entityId).filter(Entity::isValid);
+    }
+
+    private Optional<Entity> lookupPlayer(UUID playerId) {
+        if (playerId == null) return Optional.empty();
+        return entityLocator.findPlayer(playerId).filter(Entity::isValid).map(Entity.class::cast);
+    }
+
+    interface EntityLocator {
+        Optional<Entity> findEntity(UUID id);
+
+        Optional<Player> findPlayer(UUID id);
+    }
+
+    private static final class BukkitEntityLocator implements EntityLocator {
+        @Override
+        public Optional<Entity> findEntity(UUID id) {
+            return Optional.ofNullable(Bukkit.getEntity(id));
         }
 
-        return Optional.empty();
+        @Override
+        public Optional<Player> findPlayer(UUID id) {
+            return Optional.ofNullable(Bukkit.getPlayer(id));
+        }
     }
 
     private Optional<Entity> lookupEntity(UUID entityId) {
