@@ -1,5 +1,5 @@
 name: ParticleEngine
-version: '${version}'
+version: ${version}
 main: com.github.cybellereaper.particleengine.ParticleEnginePlugin
 api-version: '1.21'
 authors: [cybellereaper]

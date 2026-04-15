@@ -12,7 +12,6 @@ public enum AnchorPoint {
         return switch (selector.trim().toLowerCase(Locale.ROOT)) {
             case "head" -> HEAD;
             case "back" -> BACK;
-            case "feet" -> FEET;
             default -> FEET;
         };
     }
