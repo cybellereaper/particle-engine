@@ -16,4 +16,8 @@ public record SpawnRequest(
     public static SpawnRequest at(Location location) {
         return new SpawnRequest(null, location, null, Set.of(), Map.of());
     }
+
+    public static SpawnRequest forEntity(UUID entityId) {
+        return new SpawnRequest(entityId, null, entityId, Set.of(), Map.of());
+    }
 }
