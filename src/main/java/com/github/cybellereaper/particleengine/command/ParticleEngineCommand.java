@@ -65,7 +65,8 @@ public final class ParticleEngineCommand implements CommandExecutor, TabComplete
             return true;
         }
         try {
-            UUID id = api.spawn(template, SpawnRequest.at(player.getLocation()));
+            SpawnRequest request = new SpawnRequest(player.getUniqueId(), player.getLocation(), player.getUniqueId(), Set.of(), Map.of());
+            UUID id = api.spawn(template, request);
             sender.sendMessage(ChatColor.GREEN + "Spawned effect " + template + " with runtime id " + id);
         } catch (Exception ex) {
             sender.sendMessage(ChatColor.RED + "Spawn failed: " + ex.getMessage());

@@ -91,6 +91,21 @@ Then reload and spawn it:
 /pe spawn heal_ring
 ```
 
+
+Anchor selector supports common anchor points when resolving from an entity/player:
+- `feet` (default)
+- `head`
+- `back`
+
+Example:
+```yaml
+anchor:
+  type: PLAYER
+  selector: head
+  space: LOCAL
+```
+
+
 ## API how-to examples (for other plugins)
 
 ### Spawn an effect at a location

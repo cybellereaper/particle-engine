@@ -1,26 +1,95 @@
 package com.github.cybellereaper.particleengine.anchor;
 
+import com.github.cybellereaper.particleengine.effect.AnchorPoint;
 import com.github.cybellereaper.particleengine.effect.AnchorType;
 import com.github.cybellereaper.particleengine.effect.EffectTemplate;
 import com.github.cybellereaper.particleengine.runtime.EffectRuntimeContext;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
 import java.util.Optional;
+import java.util.UUID;
 
 public final class AnchorResolver {
+    private final EntityLocator entityLocator;
+    private final AnchorLocationCalculator locationCalculator;
+
+    public AnchorResolver() {
+        this(new BukkitEntityLocator(), new AnchorLocationCalculator());
+    }
+
+    AnchorResolver(EntityLocator entityLocator) {
+        this(entityLocator, new AnchorLocationCalculator());
+    }
+
+    AnchorResolver(EntityLocator entityLocator, AnchorLocationCalculator locationCalculator) {
+        this.entityLocator = entityLocator;
+        this.locationCalculator = locationCalculator;
+    }
+
     public Optional<Location> resolve(EffectTemplate template, EffectRuntimeContext context) {
+        AnchorType anchorType = template.anchor().type();
+
+        Optional<Location> fromEntity = resolveFromEntity(anchorType, context, template.anchor().selector());
+        if (fromEntity.isPresent()) {
+            return fromEntity;
+        }
+
         if (context.anchorLocation() != null) {
             return Optional.of(context.anchorLocation().clone());
         }
-        if (context.anchorEntityId() != null) {
-            Entity entity = Bukkit.getEntity(context.anchorEntityId());
-            if (entity != null && entity.isValid()) return Optional.of(entity.getLocation());
-        }
-        if (template.anchor().type() == AnchorType.COORDINATE && context.anchorLocation() != null) {
-            return Optional.of(context.anchorLocation().clone());
-        }
+
         return Optional.empty();
+    }
+
+    private Optional<Location> resolveFromEntity(AnchorType type, EffectRuntimeContext context, String selector) {
+        Optional<Entity> entity = switch (type) {
+            case PLAYER -> resolvePlayerEntity(context);
+            case ENTITY -> lookupEntity(context.anchorEntityId());
+            default -> Optional.empty();
+        };
+
+        if (entity.isEmpty()) return Optional.empty();
+
+        Entity resolvedEntity = entity.get();
+        Location base = resolvedEntity.getLocation();
+        AnchorPoint point = AnchorPoint.fromSelector(selector);
+        return Optional.of(locationCalculator.calculate(base, base.getDirection(), resolvedEntity.getHeight(), point));
+    }
+
+    private Optional<Entity> resolvePlayerEntity(EffectRuntimeContext context) {
+        Optional<Entity> explicitEntity = lookupEntity(context.anchorEntityId());
+        if (explicitEntity.isPresent()) return explicitEntity;
+        return lookupPlayer(context.initiator());
+    }
+
+    private Optional<Entity> lookupEntity(UUID entityId) {
+        if (entityId == null) return Optional.empty();
+        return entityLocator.findEntity(entityId).filter(Entity::isValid);
+    }
+
+    private Optional<Entity> lookupPlayer(UUID playerId) {
+        if (playerId == null) return Optional.empty();
+        return entityLocator.findPlayer(playerId).filter(Entity::isValid).map(Entity.class::cast);
+    }
+
+    interface EntityLocator {
+        Optional<Entity> findEntity(UUID id);
+
+        Optional<Player> findPlayer(UUID id);
+    }
+
+    private static final class BukkitEntityLocator implements EntityLocator {
+        @Override
+        public Optional<Entity> findEntity(UUID id) {
+            return Optional.ofNullable(Bukkit.getEntity(id));
+        }
+
+        @Override
+        public Optional<Player> findPlayer(UUID id) {
+            return Optional.ofNullable(Bukkit.getPlayer(id));
+        }
     }
 }
