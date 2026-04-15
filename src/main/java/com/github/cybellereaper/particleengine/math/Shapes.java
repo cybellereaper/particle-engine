@@ -2,6 +2,8 @@ package com.github.cybellereaper.particleengine.math;
 
 import com.github.cybellereaper.particleengine.effect.EmitterDefinition;
 
+import com.github.cybellereaper.particleengine.util.KeyframeValueResolver;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +17,8 @@ public final class Shapes {
     }
 
     public static List<Vec3> line(EmitterDefinition emitter, int tick, Random random) {
-        Vec3 from = vec(emitter.params(), "from", new Vec3(0, 0, 0));
-        Vec3 to = vec(emitter.params(), "to", new Vec3(0, 0, 1));
+        Vec3 from = vec(emitter.params(), "from", tick, new Vec3(0, 0, 0));
+        Vec3 to = vec(emitter.params(), "to", tick, new Vec3(0, 0, 1));
         int points = Math.max(2, emitter.points());
         List<Vec3> out = new ArrayList<>(points);
         for (int i = 0; i < points; i++) out.add(Vec3.lerp(from, to, i / (double) (points - 1)));
@@ -24,7 +26,7 @@ public final class Shapes {
     }
 
     public static List<Vec3> circle(EmitterDefinition emitter, int tick, Random random) {
-        double r = num(emitter.params(), "radius", 1.0);
+        double r = num(emitter.params(), "radius", tick, 1.0);
         int points = Math.max(3, emitter.points());
         List<Vec3> out = new ArrayList<>(points);
         for (int i = 0; i < points; i++) {
@@ -35,9 +37,9 @@ public final class Shapes {
     }
 
     public static List<Vec3> spiral(EmitterDefinition emitter, int tick, Random random) {
-        double r = num(emitter.params(), "radius", 1.2);
-        double h = num(emitter.params(), "height", 2.0);
-        double turns = num(emitter.params(), "turns", 3.0);
+        double r = num(emitter.params(), "radius", tick, 1.2);
+        double h = num(emitter.params(), "height", tick, 2.0);
+        double turns = num(emitter.params(), "turns", tick, 3.0);
         int points = Math.max(6, emitter.points());
         List<Vec3> out = new ArrayList<>(points);
         for (int i = 0; i < points; i++) {
@@ -49,9 +51,9 @@ public final class Shapes {
     }
 
     public static List<Vec3> helix(EmitterDefinition emitter, int tick, Random random) {
-        double r = num(emitter.params(), "radius", 1.0);
-        double h = num(emitter.params(), "height", 2.0);
-        double turns = num(emitter.params(), "turns", 2.0);
+        double r = num(emitter.params(), "radius", tick, 1.0);
+        double h = num(emitter.params(), "height", tick, 2.0);
+        double turns = num(emitter.params(), "turns", tick, 2.0);
         int points = Math.max(8, emitter.points());
         List<Vec3> out = new ArrayList<>(points);
         for (int i = 0; i < points; i++) {
@@ -63,7 +65,7 @@ public final class Shapes {
     }
 
     public static List<Vec3> sphere(EmitterDefinition emitter, int tick, Random random) {
-        double r = num(emitter.params(), "radius", 1.0);
+        double r = num(emitter.params(), "radius", tick, 1.0);
         int points = Math.max(8, emitter.points());
         List<Vec3> out = new ArrayList<>(points);
         for (int i = 0; i < points; i++) {
@@ -81,7 +83,7 @@ public final class Shapes {
     }
 
     public static List<Vec3> box(EmitterDefinition emitter, int tick, Random random) {
-        Vec3 size = vec(emitter.params(), "size", new Vec3(1, 1, 1));
+        Vec3 size = vec(emitter.params(), "size", tick, new Vec3(1, 1, 1));
         int points = Math.max(8, emitter.points());
         List<Vec3> out = new ArrayList<>(points);
         for (int i = 0; i < points; i++) {
@@ -95,8 +97,8 @@ public final class Shapes {
     }
 
     public static List<Vec3> cone(EmitterDefinition emitter, int tick, Random random) {
-        double r = num(emitter.params(), "radius", 1.0);
-        double h = num(emitter.params(), "height", 2.0);
+        double r = num(emitter.params(), "radius", tick, 1.0);
+        double h = num(emitter.params(), "height", tick, 2.0);
         int points = Math.max(6, emitter.points());
         List<Vec3> out = new ArrayList<>(points);
         for (int i = 0; i < points; i++) {
@@ -108,8 +110,8 @@ public final class Shapes {
     }
 
     public static List<Vec3> cylinder(EmitterDefinition emitter, int tick, Random random) {
-        double r = num(emitter.params(), "radius", 1.0);
-        double h = num(emitter.params(), "height", 2.0);
+        double r = num(emitter.params(), "radius", tick, 1.0);
+        double h = num(emitter.params(), "height", tick, 2.0);
         int points = Math.max(8, emitter.points());
         List<Vec3> out = new ArrayList<>(points);
         for (int i = 0; i < points; i++) {
@@ -120,10 +122,10 @@ public final class Shapes {
     }
 
     public static List<Vec3> bezier(EmitterDefinition emitter, int tick, Random random) {
-        Vec3 p0 = vec(emitter.params(), "p0", new Vec3(0, 0, 0));
-        Vec3 p1 = vec(emitter.params(), "p1", new Vec3(0, 1, 0));
-        Vec3 p2 = vec(emitter.params(), "p2", new Vec3(0, 1, 1));
-        Vec3 p3 = vec(emitter.params(), "p3", new Vec3(0, 0, 2));
+        Vec3 p0 = vec(emitter.params(), "p0", tick, new Vec3(0, 0, 0));
+        Vec3 p1 = vec(emitter.params(), "p1", tick, new Vec3(0, 1, 0));
+        Vec3 p2 = vec(emitter.params(), "p2", tick, new Vec3(0, 1, 1));
+        Vec3 p3 = vec(emitter.params(), "p3", tick, new Vec3(0, 0, 2));
         int points = Math.max(4, emitter.points());
         List<Vec3> out = new ArrayList<>(points);
         for (int i = 0; i < points; i++) {
@@ -134,7 +136,7 @@ public final class Shapes {
     }
 
     public static List<Vec3> polyline(EmitterDefinition emitter, int tick, Random random) {
-        List<Vec3> controlPoints = vecList(emitter.params(), "path");
+        List<Vec3> controlPoints = vecList(emitter.params(), "path", tick);
         if (controlPoints.size() < 2) {
             return line(emitter, tick, random);
         }
@@ -200,14 +202,14 @@ public final class Shapes {
         return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
-    private static Vec3 vec(Map<String, Object> map, String key, Vec3 fallback) {
-        Object raw = map.get(key);
+    private static Vec3 vec(Map<String, Object> map, String key, int tick, Vec3 fallback) {
+        Object raw = KeyframeValueResolver.resolveObject(map, key, tick);
         if (!(raw instanceof List<?> list) || list.size() < 3) return fallback;
         return new Vec3(asDouble(list.get(0), fallback.x()), asDouble(list.get(1), fallback.y()), asDouble(list.get(2), fallback.z()));
     }
 
-    private static List<Vec3> vecList(Map<String, Object> map, String key) {
-        Object raw = map.get(key);
+    private static List<Vec3> vecList(Map<String, Object> map, String key, int tick) {
+        Object raw = KeyframeValueResolver.resolveObject(map, key, tick);
         if (!(raw instanceof List<?> list)) return List.of();
 
         List<Vec3> points = new ArrayList<>();
@@ -233,8 +235,8 @@ public final class Shapes {
         return null;
     }
 
-    private static double num(Map<String, Object> map, String key, double fallback) {
-        return asDouble(map.get(key), fallback);
+    private static double num(Map<String, Object> map, String key, int tick, double fallback) {
+        return KeyframeValueResolver.resolveNumber(map, key, tick, fallback);
     }
 
     private static double asDouble(Object raw, double fallback) {

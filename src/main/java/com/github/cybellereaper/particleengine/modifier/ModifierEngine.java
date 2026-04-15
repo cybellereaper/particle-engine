@@ -2,6 +2,7 @@ package com.github.cybellereaper.particleengine.modifier;
 
 import com.github.cybellereaper.particleengine.effect.ModifierDefinition;
 import com.github.cybellereaper.particleengine.math.Vec3;
+import com.github.cybellereaper.particleengine.util.KeyframeValueResolver;
 
 import java.util.List;
 
@@ -10,8 +11,8 @@ public final class ModifierEngine {
         Vec3 current = point;
         for (ModifierDefinition modifier : modifiers) {
             current = switch (modifier.type().toUpperCase()) {
-                case "SPIN_YAW" -> spinYaw(current, tick, asDouble(modifier.params().get("speed"), 1.0));
-                case "WAVE_Y" -> waveY(current, tick, asDouble(modifier.params().get("amplitude"), 0.2), asDouble(modifier.params().get("frequency"), 0.15));
+                case "SPIN_YAW" -> spinYaw(current, tick, KeyframeValueResolver.resolveNumber(modifier.params(), "speed", tick, 1.0));
+                case "WAVE_Y" -> waveY(current, tick, KeyframeValueResolver.resolveNumber(modifier.params(), "amplitude", tick, 0.2), KeyframeValueResolver.resolveNumber(modifier.params(), "frequency", tick, 0.15));
                 default -> current;
             };
         }
@@ -29,11 +30,4 @@ public final class ModifierEngine {
         return new Vec3(point.x(), point.y() + (Math.sin(tick * frequency) * amplitude), point.z());
     }
 
-    private double asDouble(Object raw, double fallback) {
-        if (raw instanceof Number n) return n.doubleValue();
-        if (raw instanceof String s) {
-            try { return Double.parseDouble(s); } catch (NumberFormatException ignored) { }
-        }
-        return fallback;
-    }
 }
