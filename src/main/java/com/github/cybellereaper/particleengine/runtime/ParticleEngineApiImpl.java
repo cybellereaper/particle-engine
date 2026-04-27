@@ -57,6 +57,56 @@ public final class ParticleEngineApiImpl implements ParticleEngineApi {
     }
 
     @Override
+    public int stopAll() {
+        int removed = 0;
+        for (ActiveEffect effect : activeRegistry.snapshot()) {
+            activeRegistry.remove(effect.runtimeId());
+            removed++;
+        }
+        return removed;
+    }
+
+    @Override
+    public boolean pause(UUID runtimeId) {
+        ActiveEffect effect = activeRegistry.get(runtimeId);
+        if (effect == null) return false;
+        effect.pause();
+        return true;
+    }
+
+    @Override
+    public int pauseByTag(String tag) {
+        int affected = 0;
+        for (ActiveEffect effect : activeRegistry.snapshot()) {
+            if (effect.tags().contains(tag) && !effect.isPaused()) {
+                effect.pause();
+                affected++;
+            }
+        }
+        return affected;
+    }
+
+    @Override
+    public boolean resume(UUID runtimeId) {
+        ActiveEffect effect = activeRegistry.get(runtimeId);
+        if (effect == null) return false;
+        effect.resume();
+        return true;
+    }
+
+    @Override
+    public int resumeByTag(String tag) {
+        int affected = 0;
+        for (ActiveEffect effect : activeRegistry.snapshot()) {
+            if (effect.tags().contains(tag) && effect.isPaused()) {
+                effect.resume();
+                affected++;
+            }
+        }
+        return affected;
+    }
+
+    @Override
     public Optional<EffectTemplate> findTemplate(String templateId) {
         return templateRegistry.find(templateId);
     }

@@ -14,6 +14,16 @@ public interface ParticleEngineApi {
 
     int stopByTag(String tag);
 
+    int stopAll();
+
+    boolean pause(UUID runtimeId);
+
+    int pauseByTag(String tag);
+
+    boolean resume(UUID runtimeId);
+
+    int resumeByTag(String tag);
+
     Optional<EffectTemplate> findTemplate(String templateId);
 
     Collection<EffectTemplate> templates();
@@ -25,6 +35,11 @@ public interface ParticleEngineApi {
             @Override public UUID spawn(String templateId, SpawnRequest request) { return new UUID(0L, 0L); }
             @Override public boolean stop(UUID runtimeId) { return false; }
             @Override public int stopByTag(String tag) { return 0; }
+            @Override public int stopAll() { return 0; }
+            @Override public boolean pause(UUID runtimeId) { return false; }
+            @Override public int pauseByTag(String tag) { return 0; }
+            @Override public boolean resume(UUID runtimeId) { return false; }
+            @Override public int resumeByTag(String tag) { return 0; }
             @Override public Optional<EffectTemplate> findTemplate(String templateId) { return Optional.empty(); }
             @Override public Collection<EffectTemplate> templates() { return java.util.List.of(); }
             @Override public Collection<ActiveEffect> activeEffects() { return java.util.List.of(); }
