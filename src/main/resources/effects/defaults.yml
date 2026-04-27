@@ -40,3 +40,45 @@ effects:
     modifiers:
       - type: SPIN_YAW
         speed: 4.0
+
+  pulsing_aura:
+    family: AURA
+    particle: HEART
+    count: 1
+    lifetimeTicks: 200
+    anchor:
+      type: PLAYER
+      selector: self
+      space: LOCAL
+    emitters:
+      - shape: SPHERE
+        rate: 1
+        points: 32
+        radius: 1.0
+    modifiers:
+      - type: PULSE
+        amplitude: 0.4
+        frequency: 0.18
+      - type: SPIN_YAW
+        speed: 3.0
+
+  drifting_smoke:
+    family: TRAIL
+    particle: CLOUD
+    count: 1
+    lifetimeTicks: 80
+    anchor:
+      type: PLAYER
+      selector: self
+      space: LOCAL
+    emitters:
+      - shape: SPHERE
+        rate: 1
+        points: 18
+        radius: 0.5
+    modifiers:
+      - type: NOISE
+        amplitude: 0.4
+        frequency: 0.12
+      - type: GRAVITY
+        strength: -0.025

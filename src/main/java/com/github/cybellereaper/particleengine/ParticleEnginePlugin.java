@@ -12,6 +12,7 @@ public final class ParticleEnginePlugin extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
         saveResource("effects/defaults.yml", false);
+        saveResource("scripts/example.pes", false);
 
         this.bootstrap = new EngineBootstrap(this);
         this.bootstrap.start();

@@ -16,12 +16,15 @@ import com.github.cybellereaper.particleengine.registry.TemplateRegistry;
 import com.github.cybellereaper.particleengine.runtime.EffectExecutor;
 import com.github.cybellereaper.particleengine.runtime.ParticleEngineApiImpl;
 import com.github.cybellereaper.particleengine.scheduler.EngineScheduler;
+import com.github.cybellereaper.particleengine.script.BukkitScriptHost;
+import com.github.cybellereaper.particleengine.script.ScriptHost;
+import com.github.cybellereaper.particleengine.script.ScriptLoader;
+import com.github.cybellereaper.particleengine.script.ScriptRuntime;
 import com.github.cybellereaper.particleengine.timeline.TimelineEngine;
 import com.github.cybellereaper.particleengine.trigger.ParticleTriggerListener;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.Map;
+import org.bukkit.scheduler.BukkitTask;
 
 public final class EngineBootstrap {
     private final JavaPlugin plugin;
@@ -31,6 +34,10 @@ public final class EngineBootstrap {
     private final ParticleEngineApi api;
     private final EngineScheduler scheduler;
     private final DebugService debugService;
+    private final ScriptRuntime scriptRuntime;
+    private final ScriptLoader scriptLoader;
+    private final ScriptHost scriptHost;
+    private BukkitTask scriptTickTask;
 
     public EngineBootstrap(JavaPlugin plugin) {
         this.plugin = plugin;
@@ -57,11 +64,17 @@ public final class EngineBootstrap {
                 plugin.getConfig().getInt("engine.lod-throttle-factor", 2)
         );
         this.debugService = new DebugService();
+        this.scriptRuntime = new ScriptRuntime(plugin.getLogger());
+        this.scriptRuntime.setDefaultInstructionBudget(plugin.getConfig().getLong("scripts.instruction-budget", 1_000_000L));
+        this.scriptLoader = new ScriptLoader(plugin);
+        this.scriptHost = new BukkitScriptHost(api, plugin.getLogger(), scriptRuntime, plugin.getConfig().getString("scripts.default-world"));
     }
 
     public void start() {
         reloadTemplates();
+        scriptLoader.reload();
         scheduler.start();
+        startScriptTick();
         registerCommands();
         plugin.getServer().getPluginManager().registerEvents(new ParticleTriggerListener(api), plugin);
 
@@ -74,6 +87,11 @@ public final class EngineBootstrap {
 
     public void stop() {
         scheduler.stop();
+        if (scriptTickTask != null) {
+            scriptTickTask.cancel();
+            scriptTickTask = null;
+        }
+        scriptRuntime.shutdown();
         activeRegistry.snapshot().forEach(effect -> activeRegistry.remove(effect.runtimeId()));
     }
 
@@ -81,9 +99,21 @@ public final class EngineBootstrap {
         return api;
     }
 
+    public ScriptRuntime scriptRuntime() {
+        return scriptRuntime;
+    }
+
+    public ScriptLoader scriptLoader() {
+        return scriptLoader;
+    }
+
+    public ScriptHost scriptHost() {
+        return scriptHost;
+    }
+
     private void registerCommands() {
         NamedEffectStore store = new NamedEffectStore(plugin, plugin.getConfig().getString("storage.named-effects-file", "named-effects.yml"));
-        ParticleEngineCommand command = new ParticleEngineCommand(api, debugService, this::reloadAll, store);
+        ParticleEngineCommand command = new ParticleEngineCommand(api, debugService, this::reloadAll, store, scriptRuntime, scriptLoader, scriptHost);
         PluginCommand pluginCommand = plugin.getCommand("particleengine");
         if (pluginCommand != null) {
             pluginCommand.setExecutor(command);
@@ -91,9 +121,14 @@ public final class EngineBootstrap {
         }
     }
 
+    private void startScriptTick() {
+        scriptTickTask = plugin.getServer().getScheduler().runTaskTimer(plugin, scriptRuntime::tick, 1L, 1L);
+    }
+
     private void reloadAll() {
         plugin.reloadConfig();
         reloadTemplates();
+        scriptLoader.reload();
     }
 
     private void reloadTemplates() {
