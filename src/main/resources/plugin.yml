@@ -7,7 +7,7 @@ description: Production-grade particle engine for Paper servers.
 commands:
   particleengine:
     description: Main command for particle engine control.
-    usage: /particleengine <help|spawn|stop|list|reload|debug|save>
+    usage: /particleengine <help|spawn|stop|list|reload|debug|save|info|at|pause|resume|run|stopscript|scripts>
     aliases: [pe, particles]
 permissions:
   particleengine.command.help:
@@ -23,6 +23,16 @@ permissions:
   particleengine.command.debug:
     default: op
   particleengine.command.save:
+    default: op
+  particleengine.command.info:
+    default: op
+  particleengine.command.at:
+    default: op
+  particleengine.command.pause:
+    default: op
+  particleengine.command.resume:
+    default: op
+  particleengine.command.script:
     default: op
   particleengine.effect.*:
     default: op

@@ -1,0 +1,30 @@
+// PEScript example: stage a multi-burst show.
+//
+// Anything in this file is interpreted by the PEScript engine when you
+// run `/pe run example`. Lines starting with `//` are comments. Statements
+// must end with a semicolon. `wait <ticks>` suspends the script for the
+// requested number of server ticks (20 ticks = 1 second).
+
+log("Starting example show...");
+
+// User-defined function: spawn an effect with a tag for later cleanup.
+fn burst(template, x, y, z) {
+    if (template_exists(template)) {
+        spawn(template, at(x, y, z), ["demo"]);
+    } else {
+        log("Skipping unknown template:", template);
+    }
+}
+
+// Sequence three bursts in a circle around (0, 64, 0).
+let radius = 4;
+for (i in range(3)) {
+    let angle = (i / 3) * (2 * pi());
+    burst("trail_smoke", cos(angle) * radius, 64, sin(angle) * radius);
+    wait 10;
+}
+
+// Linger before cleaning up.
+wait 60;
+let removed = stop_tag("demo");
+log("Cleaned up", removed, "effect(s).");

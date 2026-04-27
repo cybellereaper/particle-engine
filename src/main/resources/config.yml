@@ -12,3 +12,11 @@ storage:
 
 debug:
   enabled-by-default: false
+
+scripts:
+  # PEScript instruction budget per execution. Scripts that run longer than
+  # this without yielding via `wait` will abort with a runtime error.
+  instruction-budget: 1000000
+  # Optional default world name used when scripts call at(x, y, z) with no
+  # explicit world. If unset, scripts must always pass a world name.
+  default-world: ""

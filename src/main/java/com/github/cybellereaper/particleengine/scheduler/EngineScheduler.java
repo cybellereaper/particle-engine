@@ -43,6 +43,9 @@ public final class EngineScheduler {
             if (System.nanoTime() - start > tickBudgetNanos) {
                 break;
             }
+            if (activeEffect.isPaused()) {
+                continue;
+            }
             executor.tick(activeEffect, maxViewDistance, lodThrottleFactor);
             activeEffect.incrementAge();
             if (activeEffect.isExpired()) {
